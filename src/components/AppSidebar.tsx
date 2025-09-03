@@ -1,5 +1,5 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader } from "@/components/ui/sidebar";
-import { Target, TrendingUp, Users, Home, Settings, Database, BarChart3, Package, ShoppingCart, ChartScatter, FileText, Calendar, Bell, Building2, Tag, UserPlus, Activity, Brain, Warehouse, Rocket, GitBranch, Network, TrendingDown, ArrowLeftRight, UserCheck } from "lucide-react";
+import { Target, TrendingUp, Users, Home, Settings, Database, BarChart3, Package, ShoppingCart, ChartScatter, FileText, Calendar, Bell, Building2, Tag, UserPlus, Activity, Brain, Warehouse, Rocket, GitBranch, Network, TrendingDown, ArrowLeftRight, UserCheck, Factory, AlertTriangle, Truck, BellRing, Shield } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useState, useEffect } from "react";
@@ -9,6 +9,11 @@ interface CompanyConfig {
   company_logo: string;
 }
 const items = [
+   {
+  title: "Análisis postgame",
+  url: "/kpi-dashboard",
+  icon: Target
+},
   /*{
   title: "Inicio",
   url: "/planner-dashboard",
@@ -30,15 +35,10 @@ const items = [
   title: "Colaboración en Pronósticos",
   url: "/forecast-collaboration",
   icon: Users
-}, {
-  title: "Supply Workbench",
-  url: "/supply-workbench",
-  icon: Warehouse
-}, {
-  title: "Red de Suministro",
-  url: "/supply-network",
-  icon: Network
-}, /*{
+}, 
+
+
+/*{
   title: "Análisis What-If",
   url: "/what-if-analysis",
   icon: Brain
@@ -46,30 +46,16 @@ const items = [
   title: "Proyecciones de Inventario",
   url: "/inventory-projections",
   icon: Warehouse
-},*/ {
-  title: "Gestión de Compras",
-  url: "/purchase-management",
-  icon: ShoppingCart
-},  {
+},*/{
   title: "Análisis Sell-Through",
   url: "/sell-through-analytics",
   icon: TrendingDown
 }
-, {
-  title: "Dashboard de KPIs",
-  url: "/kpi-dashboard",
-  icon: Target
-},
+,
 {
   title: "Análisis What-If",
   url: "/what-if-analysis",
   icon: Brain
-},
-
-{
-  title: "Ag-Data-Grids",
-  url: "/ag-data-grids",
-  icon: BarChart3
 }
 
 /*, {
@@ -77,6 +63,46 @@ const items = [
   url: "/advanced-reports",
   icon: BarChart3
 }*/];
+
+// Fulfillment items
+const fulfillmentItems = [
+   {
+  title: "Red de Suministro",
+  url: "/supply-network",
+  icon: Network
+},
+  {
+    title: 'Revisión de Políticas de Inventario',
+    url: '/inventory-policy-review',
+    icon: Database
+  },
+  {
+    title: 'Planificación de Suministro',
+    url: '/replenishment-dashboard',
+    icon: Package
+  },
+  {
+    title: 'Configuración de Alertas',
+    url: '/alert-configuration',
+    icon: BellRing
+  },
+  {
+    title: 'Alertas Activas',
+    url: '/active-alerts',
+    icon: AlertTriangle
+  },
+  {
+    title: 'Dashboard de Excepciones',
+    url: '/exception-dashboard',
+    icon: Shield
+  },
+  {
+    title: 'Parámetros de Órdenes de Compra',
+    url: '/purchase-order-parameters',
+    icon: Settings
+  }
+];
+
 /*
 // NPI items
 const npiItems = [{
@@ -220,7 +246,27 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-gray-600 font-semibold">
+             Fulfillment
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {fulfillmentItems.map(item => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton 
+                    onClick={() => navigate(item.url)} 
+                    isActive={location.pathname === item.url} 
+                    className="w-full justify-start text-gray-700 hover:text-gray-900 hover:bg-green-100 data-[active=true]:bg-green-100 data-[active=true]:text-green-900 data-[active=true]:border-r-2 data-[active=true]:border-green-600"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="font-medium">{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
         {isAdministrator && <SidebarGroup>
             <SidebarGroupLabel className="text-gray-600 font-semibold">

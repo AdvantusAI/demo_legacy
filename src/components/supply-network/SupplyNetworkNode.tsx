@@ -17,7 +17,7 @@ export const SupplyNetworkNode = memo(({
 }: NodeProps) => {
   const nodeData = data as unknown as SupplyNetworkNodeData;
   const getNodeIcon = (iconName?: string) => {
-    const iconProps = { size: 24, className: "text-gray-600" };
+    const iconProps = { size: 24, className: "text-gray-700" };
     
     switch (iconName?.toLowerCase()) {
       case 'truck':
@@ -50,21 +50,9 @@ export const SupplyNetworkNode = memo(({
       <Handle 
         type="target" 
         position={Position.Top} 
-        style={{
-          background: '#ffffff',
-          border: '2px solid #e5e7eb',
-          width: '12px',
-          height: '12px',
-          borderRadius: '50%'
-        }} 
       />
       
-      <div 
-        className="w-24 h-24 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col items-center justify-center cursor-pointer"
-        style={{
-          border: `3px solid ${nodeData.color}`,
-        }}
-      >
+      <div className="w-24 h-24 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col items-center justify-center cursor-pointer border border-gray-300">
         <div className="flex flex-col items-center justify-center h-full text-gray-600">
           {getNodeIcon(nodeData.iconName)}
           <span className="text-xs font-medium mt-1 text-center leading-tight">
@@ -80,13 +68,6 @@ export const SupplyNetworkNode = memo(({
       <Handle 
         type="source" 
         position={Position.Bottom} 
-        style={{
-          background: '#ffffff',
-          border: '2px solid #e5e7eb',
-          width: '12px',
-          height: '12px',
-          borderRadius: '50%'
-        }} 
       />
     </div>
   );

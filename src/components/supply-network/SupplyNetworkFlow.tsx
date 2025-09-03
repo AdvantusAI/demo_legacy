@@ -4,16 +4,14 @@ import {
   MiniMap,
   Controls,
   Background,
+  useNodesState,
+  useEdgesState,
   addEdge,
-  applyNodeChanges,
-  applyEdgeChanges,
   Connection,
   Edge,
   Node,
   NodeTypes,
   MarkerType,
-  EdgeChange,
-  NodeChange,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -25,30 +23,18 @@ import { RelationshipEditorModal } from './RelationshipEditorModal';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
+import { Wrench, Settings } from 'lucide-react';
 
-// ---------- helpers ----------
-const nodeTypes: NodeTypes = { supplyNetworkNode: SupplyNetworkNode };
-
-const getNodeColor = (nodeTypeCode: string) => {
-  switch (nodeTypeCode?.toLowerCase()) {
-    case 'factory':
-    case 'manufacturer':
-      return '#ef4444';
-    case 'warehouse':
-      return '#3b82f6';
-    case 'distributor':
-    case 'distribution_center':
-      return '#10b981';
-    case 'retailer':
-    case 'retail':
-      return '#8b5cf6';
-    case 'supplier':
-      return '#f59e0b';
-    default:
-      return '#6b7280';
-  }
+const nodeTypes: NodeTypes = {
+  supplyNetworkNode: SupplyNetworkNode,
 };
 
+const getNodeColor = (nodeTypeCode: string) => {
+  // Return default color for all node types
+  return '#082647'; // Default gray
+};
+
+// Save/load positions from localStorage
 const saveNodePositions = (nodes: Node[]) => {
   const positions = nodes.reduce((acc, node) => {
     acc[node.id] = node.position;
@@ -66,156 +52,127 @@ const loadNodePositions = (): Record<string, { x: number; y: number }> => {
   }
 };
 
-// shallow guard: update only if ids/length changed (prevents loops from new array identities)
-const sameNodeSet = (a: Node[], b: Node[]) =>
-  a.length === b.length && a.every((n, i) => n.id === b[i]?.id);
-
-const sameEdgeSet = (a: Edge[], b: Edge[]) =>
-  a.length === b.length && a.every((e, i) => e.id === b[i]?.id);
-
-// stable signatures of upstream data (so effects don’t run each render due to new refs)
-const nodesSignature = (dbNodes: any[] | undefined, dbNodeTypes: any[]) =>
-  JSON.stringify(
-    (dbNodes ?? [])
-      .map(n => [n.id, n.node_name, n.node_type_id, n.status])
-      .sort((x, y) => String(x[0]).localeCompare(String(y[0])))
-      .concat(
-        dbNodeTypes
-          .map(t => ['t', t.id, t.type_code])
-          .sort((x, y) => String(x[1]).localeCompare(String(y[1])))
-      )
-  );
-
-const relsSignature = (rels: any[] | undefined) =>
-  JSON.stringify(
-    (rels ?? [])
-      .map(r => [r.id, r.source_node_id, r.target_node_id, r.status, r.lead_time_days, r.primary_transport_cost])
-      .sort((x, y) => String(x[0]).localeCompare(String(y[0])))
-  );
-
-// ---------- component ----------
 export const SupplyNetworkFlow: React.FC = () => {
-  const {
-    nodes: dbNodes,
-    relationships: dbRelationships,
-    isLoading,
-    createRelationship,
-    deleteRelationship, // not used here, but kept from your hook
-  } = useSupplyNetwork();
-
+  const { nodes: dbNodes, relationships: dbRelationships, isLoading, createRelationship, deleteRelationship } = useSupplyNetwork();
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [editingRelationshipId, setEditingRelationshipId] = useState<string | null>(null);
-  const [dbNodeTypes, setDbNodeTypes] = useState<Array<{ id: string; type_code: string; type_name: string; icon_name: string }>>([]);
+  const [dbNodeTypes, setDbNodeTypes] = useState<Array<{id: string, type_code: string, type_name: string, icon_name: string}>>([]);
+  const [contextMenu, setContextMenu] = useState<{
+    id: string;
+    x: number;
+    y: number;
+  } | null>(null);
 
-  // Fetch node types once
+  // Fetch node types
   useEffect(() => {
-    let ignore = false;
-    (async () => {
+    const fetchNodeTypes = async () => {
       try {
-        const { data, error } = await supabase.rpc('get_supply_network_node_types');
+        const { data, error } = await 
+          (supabase as any).schema('m8_schema').rpc('get_supply_network_node_types');
         if (error) throw error;
-        if (!ignore) setDbNodeTypes(data || []);
-      } catch (err) {
-        console.error('Error fetching node types:', err);
+        setDbNodeTypes(data || []);
+      } catch (error) {
+        console.error('Error fetching node types:', error);
       }
-    })();
-    return () => {
-      ignore = true;
     };
-  }, []);
 
-  // Build flow nodes from DB + saved positions (pure, memoized)
-  const builtFlowNodes: Node[] = useMemo(() => {
+    fetchNodeTypes();
+  }, []);
+  
+  // Convert database nodes to React Flow nodes
+  const flowNodes: Node[] = useMemo(() => {
     if (!dbNodes) return [];
-    const saved = loadNodePositions();
-    return dbNodes.map((node: any, index: number) => {
-      const typeInfo = dbNodeTypes.find(nt => nt.id === node.node_type_id);
-      const savedPos = saved[node.id];
+    
+    const savedPositions = loadNodePositions();
+    
+    return dbNodes.map((node, index) => {
+      const nodeTypeInfo = dbNodeTypes.find(nt => nt.id === node.node_type_id);
+      const savedPosition = savedPositions[node.id];
+      
       return {
         id: node.id,
         type: 'supplyNetworkNode',
-        position: savedPos || { x: (index % 4) * 250 + 100, y: Math.floor(index / 4) * 200 + 100 },
+        position: savedPosition || { 
+          x: (index % 4) * 250 + 100, 
+          y: Math.floor(index / 4) * 200 + 100 
+        },
         data: {
           label: node.node_name || node.id,
           nodeType: node.node_type_id || 'unknown',
-          nodeTypeCode: typeInfo?.type_code || 'unknown',
-          iconName: typeInfo?.icon_name || 'Package',
+          nodeTypeCode: nodeTypeInfo?.type_code || 'unknown',
+          iconName: nodeTypeInfo?.icon_name || 'Package',
           properties: node.contact_information || {},
           status: node.status,
-          color: getNodeColor(typeInfo?.type_code || 'unknown'),
+          color: getNodeColor(nodeTypeInfo?.type_code || 'unknown'),
         },
-      } as Node;
+      };
     });
   }, [dbNodes, dbNodeTypes]);
 
-  // Build flow edges from DB (pure, memoized)
-  const builtFlowEdges: Edge[] = useMemo(() => {
+  // Convert database relationships to React Flow edges
+  const flowEdges: Edge[] = useMemo(() => {
     if (!dbRelationships) return [];
-    return dbRelationships.map((rel: any) => {
+    
+    return dbRelationships.map((rel) => {
+      // Create a meaningful label with lead time and cost
       const leadTime = rel.lead_time_days ? `${rel.lead_time_days}d` : '';
       const cost = rel.primary_transport_cost ? `$${rel.primary_transport_cost}` : '';
       const labelParts = [leadTime, cost].filter(Boolean);
-      const label = labelParts.length ? labelParts.join(' | ') : 'Connection';
+      const label = labelParts.length > 0 ? labelParts.join(' | ') : 'Connection';
 
-      return {
-        id: rel.id,
-        source: rel.source_node_id,
-        target: rel.target_node_id,
-        type: 'smoothstep',
-        animated: rel.status === 'active',
-        label,
-        markerEnd: { type: MarkerType.ArrowClosed },
-        style: {
-          stroke: rel.status === 'active' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
-          strokeWidth: 2,
-        },
-        data: {
+              return {
+          id: rel.id,
+          source: rel.source_node_id,
+          target: rel.target_node_id,
+          animated: rel.status === 'active',
+          label: '',
+          style: {
+            strokeWidth: 2,
+            stroke: '#FF0072',
+          },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: 20,
+            height: 20,
+            color: '#FF0072',
+          },
+          data: {
           relationshipId: rel.id,
           relationshipType: rel.relationship_type_id || 'unknown',
-          properties: {
-            description: rel.description || '',
+          properties: { 
+            description: rel.description || '', 
             cost: rel.cost || 0,
-            leadTime: rel.lead_time_days || 0,
+            leadTime: rel.lead_time_days || 0
           },
           status: rel.status,
         },
-      } as Edge;
+      };
     });
   }, [dbRelationships]);
 
-  // Local state
-  const [nodes, setNodes] = useState<Node[]>(builtFlowNodes);
-  const [edges, setEdges] = useState<Edge[]>(builtFlowEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(flowNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(flowEdges);
 
-  // Stable signatures of upstream data
-  const nodesSig = useMemo(() => nodesSignature(dbNodes, dbNodeTypes), [dbNodes, dbNodeTypes]);
-  const edgesSig = useMemo(() => relsSignature(dbRelationships), [dbRelationships]);
+  // Save positions when nodes change
+  const handleNodesChange = useCallback((changes: any[]) => {
+    onNodesChange(changes);
+    // Save positions after a short delay to avoid excessive saves during dragging
+    setTimeout(() => {
+      setNodes((currentNodes) => {
+        saveNodePositions(currentNodes);
+        return currentNodes;
+      });
+    }, 100);
+  }, [onNodesChange, setNodes]);
 
-  // Sync local nodes only when DB content meaningfully changes
+  // Update nodes and edges when database data changes
   useEffect(() => {
-    setNodes(prev => (sameNodeSet(prev, builtFlowNodes) ? prev : builtFlowNodes));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodesSig]); // intentionally not depending on builtFlowNodes identity
+    setNodes(flowNodes);
+  }, [flowNodes]);
 
-  // Sync local edges only when DB content meaningfully changes
   useEffect(() => {
-    setEdges(prev => (sameEdgeSet(prev, builtFlowEdges) ? prev : builtFlowEdges));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [edgesSig]); // intentionally not depending on builtFlowEdges identity
-
-  // Handlers
-  const handleNodesChange = useCallback((changes: NodeChange[]) => {
-    setNodes(current => {
-      const updated = applyNodeChanges(changes, current);
-      // debounce-ish save; harmless for render loop (no state change)
-      setTimeout(() => saveNodePositions(updated), 100);
-      return updated;
-    });
-  }, []);
-
-  const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
-    setEdges(current => applyEdgeChanges(changes, current));
-  }, []);
+    setEdges(flowEdges);
+  }, [flowEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -232,15 +189,38 @@ export const SupplyNetworkFlow: React.FC = () => {
     [createRelationship]
   );
 
-  const onEdgeDoubleClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-    event.preventDefault();
-    const id = edge.data?.relationshipId;
-    if (typeof id === 'string') setEditingRelationshipId(id);
-  }, []);
+  const onEdgeDoubleClick = useCallback(
+    (event: React.MouseEvent, edge: Edge) => {
+      event.preventDefault();
+      if (edge.data?.relationshipId && typeof edge.data.relationshipId === 'string') {
+        setEditingRelationshipId(edge.data.relationshipId);
+      }
+    },
+    []
+  );
 
-  const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
-    event.preventDefault();
-    setEditingNodeId(node.id);
+  const onNodeDoubleClick = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      setEditingNodeId(node.id);
+    },
+    []
+  );
+
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      setContextMenu({
+        id: node.id,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    },
+    []
+  );
+
+  const onPaneClick = useCallback(() => {
+    setContextMenu(null);
   }, []);
 
   if (isLoading) {
@@ -257,35 +237,71 @@ export const SupplyNetworkFlow: React.FC = () => {
   return (
     <div className="w-full h-[800px] relative">
       <SupplyNetworkToolbar />
-
+      
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={handleNodesChange}
-        onEdgesChange={handleEdgesChange}
+        onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onEdgeDoubleClick={onEdgeDoubleClick}
         onNodeDoubleClick={onNodeDoubleClick}
+        onNodeContextMenu={onNodeContextMenu}
+        onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         fitView
         attributionPosition="top-right"
-        style={{ backgroundColor: 'hsl(var(--background))' }}
         className="bg-background"
       >
         <Controls />
-        <MiniMap
-          style={{ backgroundColor: 'hsl(var(--muted))' }}
-          nodeColor={(node) => (node.style?.background as string) || 'hsl(var(--primary))'}
-        />
-        <Background color="hsl(var(--muted-foreground))" gap={20} style={{ backgroundColor: 'hsl(var(--background))' }} />
+        <MiniMap />
+        <Background />
       </ReactFlow>
 
       {editingNodeId && (
-        <EditNodeModal isOpen onClose={() => setEditingNodeId(null)} nodeId={editingNodeId} />
+        <EditNodeModal
+          isOpen={!!editingNodeId}
+          onClose={() => setEditingNodeId(null)}
+          nodeId={editingNodeId}
+        />
       )}
 
       {editingRelationshipId && (
-        <RelationshipEditorModal isOpen onClose={() => setEditingRelationshipId(null)} relationshipId={editingRelationshipId} />
+        <RelationshipEditorModal
+          isOpen={!!editingRelationshipId}
+          onClose={() => setEditingRelationshipId(null)}
+          relationshipId={editingRelationshipId}
+        />
+      )}
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <div
+          className="fixed z-50 bg-[#e1ebf7] border border-gray-200 rounded-lg shadow-lg py-1 min-w-[150px]"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y,
+          }}
+        >
+          <button
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center"
+            onClick={() => {
+              console.log('Supply workbench clicked for node:', contextMenu.id);
+              setContextMenu(null);
+            }}
+          >
+            <Wrench className="mr-2 h-4 w-4" /> Supply workbench
+          </button>
+          <button
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center"
+            onClick={() => {
+              console.log('Parámetros de suministro clicked for node:', contextMenu.id);
+              setContextMenu(null);
+            }}
+          >
+            <Settings className="mr-2 h-4 w-4" /> Parámetros de suministro
+          </button>
+        </div>
       )}
     </div>
   );

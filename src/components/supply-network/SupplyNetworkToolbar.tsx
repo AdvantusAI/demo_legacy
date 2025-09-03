@@ -13,6 +13,10 @@ export const SupplyNetworkToolbar: React.FC = () => {
 
 
 
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   return (
     <Card className="absolute top-4 left-4 z-10 p-2">
       <div className="flex items-center gap-2">
@@ -49,8 +53,12 @@ export const SupplyNetworkToolbar: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-       
-       
+        <Button size="sm" variant="outline" onClick={handleRefresh}>
+          <RefreshCw className="h-4 w-4 mr-1" />
+          Actualizar
+        </Button>
+
+     
       </div>
     </Card>
   );
