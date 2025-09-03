@@ -34,7 +34,7 @@ export const ScopeSelector: React.FC<ScopeSelectorProps> = ({
     try {
       // Fetch products
       const { data: productsData, error: productsError } = await supabase
-        .schema('m8_schema')
+      .schema('m8_schema')
         .from('products')
         .select('product_id, product_name')
         .limit(100);
@@ -52,7 +52,6 @@ export const ScopeSelector: React.FC<ScopeSelectorProps> = ({
 
       // Fetch vendors
       const { data: vendorsData, error: vendorsError } = await supabase
-        .schema('m8_schema')
         .from('vendors')
         .select('code, name')
         .limit(100);
@@ -62,9 +61,9 @@ export const ScopeSelector: React.FC<ScopeSelectorProps> = ({
       } else if (vendorsError) {
         console.warn('Proveedores no disponibles:', vendorsError);
         setVendors([
-          { id: 'VENDOR_A', name: 'Proveedor USA' },
-          { id: 'VENDOR_B', name: 'Proveedor Mexico' },
-          { id: 'VENDOR_C', name: 'Proveedor Europa' }
+          { id: 'VENDOR_A', name: 'Vendor Alpha' },
+          { id: 'VENDOR_B', name: 'Vendor Beta' },
+          { id: 'VENDOR_C', name: 'Vendor Gamma' }
         ]);
       }
 
@@ -72,11 +71,11 @@ export const ScopeSelector: React.FC<ScopeSelectorProps> = ({
       const { data: locationsData, error: locationsError } = await supabase
         .schema('m8_schema')
         .from('locations')
-        .select('location_id, location_name')
+        .select('location_node_id, location_name')
         .limit(100);
       
       if (locationsData && !locationsError) {
-        setLocations(locationsData.map(l => ({ id: l.location_id, name: l.location_name || l.location_id })));
+        setLocations(locationsData.map(l => ({ id: l.location_node_id, name: l.location_name || l.location_node_id })));
       } else if (locationsError) {
         console.warn('Almacenes no disponibles:', locationsError);
         setLocations([

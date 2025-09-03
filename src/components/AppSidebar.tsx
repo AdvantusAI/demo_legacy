@@ -66,11 +66,11 @@ const items = [
 
 // Fulfillment items
 const fulfillmentItems = [
-   {
-  title: "Red de Suministro",
-  url: "/supply-network",
-  icon: Network
-},
+  {
+    title: "Red de Suministro",
+    url: "/supply-network",
+    icon: Network
+  }, ,
   {
     title: 'Revisión de Políticas de Inventario',
     url: '/inventory-policy-review',

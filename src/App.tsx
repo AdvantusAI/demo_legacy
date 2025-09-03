@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MasterLayout } from "@/components/MasterLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
+import { configureAGGridLicense } from "@/lib/ag-grid-config";
 import CommercialCollaboration from "./pages/CommercialCollaboration";
 import ForecastCollaboration from "./pages/ForecastCollaboration";
 import { AdminRoute } from "@/components/AdminRoute";
@@ -47,9 +48,19 @@ import ForecastReconciliation from "./pages/ForecastReconciliation";
 import HistoryDataView from "./pages/HistoryDataView";
 import KPIDashboard from "./pages/KPIDashboard";
 import { DataGrids } from "./components/DataGrid";
+import FulfillmentDashboard from "./pages/FulfillmentDashboard";
+import ReplenishmentDashboard from "./pages/ReplenishmentDashboard";
+import AlertConfiguration from "./pages/AlertConfiguration";
+import ActiveAlerts from './pages/ActiveAlerts';
+import ExceptionDashboard from './pages/ExceptionDashboard';
+import PurchaseOrderParametersPage from './pages/PurchaseOrderParametersPage';
+import InventoryPolicyReview from './pages/InventoryPolicyReview';
 
 
 const queryClient = new QueryClient();
+
+// Initialize AG Grid globally
+configureAGGridLicense();
 
 const App = () => {
   const { user, loading } = useAuth();
@@ -122,6 +133,17 @@ const App = () => {
               <Route path="/npi-analytics" element={<NPIAnalytics />} />
               <Route path="/sell-through-analytics" element={<SellThroughAnalytics />} />
               <Route path="/forecast-reconciliation" element={<ForecastReconciliation />} />
+              <Route path="/ag-data-grids" element={<DataGrids />} />
+              {/* Fulfillment Routes */}
+              <Route path="/fulfillment-dashboard" element={<FulfillmentDashboard />} />
+              <Route path="/mrp-planning" element={<FulfillmentDashboard />} />
+              <Route path="/purchase-orders" element={<FulfillmentDashboard />} />
+              <Route path="/replenishment-dashboard" element={<ReplenishmentDashboard />} />
+              <Route path="/exception-dashboard" element={<ExceptionDashboard />} />
+              <Route path="/inventory-policy-review" element={<InventoryPolicyReview />} />
+              <Route path="/purchase-order-parameters" element={<PurchaseOrderParametersPage />} />
+              <Route path="/alert-configuration" element={<AlertConfiguration />} />
+              <Route path="/active-alerts" element={<ActiveAlerts />} />
               <Route path="/ag-data-grids" element={<DataGrids />} />
               {/* Protected Routes */}
             </Routes>

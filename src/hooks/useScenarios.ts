@@ -128,6 +128,7 @@ export const useScenarios = () => {
       }
 
       const { data, error } = await supabase
+        .schema('m8_schema')
         .from('what_if_scenarios')
         .update(updateData)
         .eq('id', id)
@@ -152,6 +153,7 @@ export const useScenarios = () => {
     mutationFn: async (scenarioId: string) => {
       // Get scenario definition
       const { data: scenario, error: scenarioError } = await supabase
+        .schema('m8_schema')
         .from('what_if_scenarios')
         .select('*')
         .eq('id', scenarioId)
@@ -161,6 +163,7 @@ export const useScenarios = () => {
 
       // Update scenario status to running
       const { error: updateError } = await supabase
+        .schema('m8_schema')
         .from('what_if_scenarios')
         .update({ 
           status: 'running',
@@ -221,6 +224,7 @@ export const useScenarios = () => {
 
         // Update scenario with results
         const { data: completedScenario, error: completeError } = await supabase
+          .schema('m8_schema')
           .from('what_if_scenarios')
           .update({ 
             status: 'completed',
@@ -236,6 +240,7 @@ export const useScenarios = () => {
       } catch (error) {
         // Update scenario status to failed
         await supabase
+          .schema('m8_schema')
           .from('what_if_scenarios')
           .update({ 
             status: 'failed',
@@ -260,6 +265,7 @@ export const useScenarios = () => {
   const deleteScenarioMutation = useMutation({
     mutationFn: async (scenarioId: string) => {
       const { error } = await supabase
+        .schema('m8_schema')
         .from('what_if_scenarios')
         .delete()
         .eq('id', scenarioId);
