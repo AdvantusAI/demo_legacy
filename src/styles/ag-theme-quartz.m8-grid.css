@@ -1,0 +1,109 @@
+/* ================================
+   M8 Analytics — AG Grid styling
+   Scope: .ag-theme-quartz.m8-grid
+   ================================ */
+
+/* Core theme tokens */
+.ag-theme-quartz.m8-grid {
+    --ag-foreground-color: #525559;
+    --ag-secondary-foreground-color: #6b7280;
+    --ag-background-color: #ffffff;
+  
+    --ag-header-background-color: #F9FAFB;
+    --ag-header-foreground-color: #919191;
+  
+    /* warm zebra like in the screenshot */
+    --ag-odd-row-background-color: #FFF8F6;
+    --ag-row-hover-color: #F5F7FA;
+    --ag-selected-row-background-color: #ECFDF5;
+  
+    --ag-border-color: #E6E8EC;
+    --ag-row-border-color: #F1F2F4;
+  
+    --ag-font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    --ag-font-size: 13px;
+    --ag-grid-size: 8px;
+  
+    --ag-row-height: 38px;
+    --ag-header-height: 40px;
+    --ag-cell-horizontal-padding: 12px;
+  
+    --ag-border-radius: 14px;
+  }
+  
+  /* Card chrome */
+  .ag-theme-quartz.m8-grid .ag-root-wrapper {
+    border: 1px solid #E6E8EC;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(16,24,40,.04);
+  }
+  
+  /* Header */
+  .ag-theme-quartz.m8-grid .ag-header {
+    border-bottom: 1px solid #E6E8EC;
+  }
+  .ag-theme-quartz.m8-grid .ag-header-cell-label {
+    font-weight: 600;
+    letter-spacing: .2px;
+  }
+  
+  /* Subtle grid lines */
+  .ag-theme-quartz.m8-grid .ag-cell {
+    border-right: 1px solid #F2F4F7;
+  }
+  .ag-theme-quartz.m8-grid .ag-row:not(.ag-row-last) .ag-cell {
+    border-bottom: 1px solid #F7F7F7;
+  }
+  
+  /* Hover effect */
+  .ag-theme-quartz.m8-grid .ag-row:hover .ag-cell {
+    background: var(--ag-row-hover-color);
+  }
+  
+  /* Selected row with left accent bar (green) */
+  .ag-theme-quartz.m8-grid .ag-row-selected .ag-cell {
+    background: var(--ag-selected-row-background-color);
+  }
+  .ag-theme-quartz.m8-grid .ag-row-selected {
+    box-shadow: inset 3px 0 0 0 #16a34a;
+  }
+  
+  /* Right-align numeric columns: add 'num' to colDefs.cellClass */
+  .ag-theme-quartz.m8-grid .ag-cell.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Soften header icons/menus */
+  .ag-theme-quartz.m8-grid .ag-header-icon {
+    opacity: .55;
+  }
+  
+  /* ---------- Chips / badges (e.g., “Model visualization”) ---------- */
+  .m8-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+  .m8-chip--yes  { background: #E8FAF0; color: #0F766E; }  /* success */
+  .m8-chip--warn { background: #FEF3C7; color: #92400E; }  /* amber */
+  .m8-chip--no   { background: #FEE2E2; color: #991B1B; }  /* red   */
+  
+  /* ---------- Tinted note cell (e.g., “Comment”) ---------- */
+  .m8-note {
+    background: #F4EAFE;
+    color: #5B21B6;
+    padding: 6px 8px;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  
+  /* Optional: small percent color helpers for Accuracy/Bias */
+  .m8-pct-ok   { color: #15803D; font-weight: 600; }  /* good  */
+  .m8-pct-warn { color: #B45309; font-weight: 600; }  /* meh   */
+  .m8-pct-bad  { color: #B91C1C; font-weight: 600; }  /* poor  */
+  

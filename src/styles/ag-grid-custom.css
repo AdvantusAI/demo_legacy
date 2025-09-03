@@ -1,0 +1,209 @@
+/* AG Grid Custom Theme */
+.ag-theme-custom {
+    --ag-background-color: hsl(var(--background));
+    --ag-foreground-color: hsl(var(--foreground));
+    --ag-border-color: hsl(var(--border));
+    --ag-secondary-border-color: hsl(var(--border));
+    --ag-header-background-color: #251f1f2d; /* Dark Gray */
+    --ag-header-foreground-color: #ffffff; /* White text for contrast */
+    --ag-odd-row-background-color: hsl(var(--muted) / 0.2);
+    --ag-even-row-background-color: #f5f5f57b;  /* ✅ NEW */
+    --ag-row-hover-color: hsl(var(--muted) / 0.5);
+    --ag-selected-row-background-color: hsl(var(--accent));
+    --ag-range-selection-background-color: hsl(var(--accent) / 0.2);
+    --ag-range-selection-border-color: hsl(var(--accent));
+    --ag-input-background-color: hsl(var(--background));
+    --ag-input-border-color: hsl(var(--border));
+    --ag-input-focus-border-color: hsl(var(--ring));
+    --ag-checkbox-background-color: hsl(var(--background));
+    --ag-checkbox-border-color: hsl(var(--border));
+    --ag-checkbox-checked-color: hsl(var(--primary));
+    --ag-font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --ag-font-size: 14px;
+    --ag-grid-size: 8px;
+    --ag-list-item-height: 40px;
+    --ag-row-height: 40px;
+    --ag-header-height: 48px;
+    --ag-icon-size: 16px;
+    --ag-cell-horizontal-padding: 12px;
+    --ag-cell-vertical-padding: 8px;
+    --ag-border-radius: calc(var(--radius) - 2px);
+  }
+  
+  /* 🔥 Filter dropdown container */
+  .ag-theme-custom .ag-menu {
+    background-color: #ffffff; /* White card-like */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+  }
+  
+  /* 🔥 Search box inside filter */
+  .ag-theme-custom .ag-menu .ag-input-field-input {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+  }
+  
+  .ag-theme-custom .ag-menu .ag-input-field-input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+  }
+  
+  /* 🔥 Checkbox items */
+  .ag-theme-custom .ag-menu .ag-set-filter-list .ag-set-filter-item {
+    padding: 6px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .ag-theme-custom .ag-menu .ag-set-filter-list .ag-set-filter-item:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* 🔥 Checkboxes */
+  .ag-theme-custom .ag-checkbox-input-wrapper {
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+  }
+  
+  .ag-theme-custom .ag-checkbox-input-wrapper.ag-checked {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+  }
+  
+  .ag-theme-custom .ag-checkbox-input-wrapper.ag-checked::after {
+    color: white;
+  }
+  
+  .ag-theme-custom .ag-header {
+    background-color: #f1f0f0bc !important; /* Dark Gray */
+     color: #333333 !important; /* Dark text for contrast */            /* White text */
+  }
+  
+  .ag-theme-custom .ag-row-even {
+    background-color: #ffffff !important;
+   
+  }
+  /* Highlight when selected */
+  .ag-row-selected {
+    background-color: #cce5ff !important;
+  }
+  
+  /* Highlight when focused */
+  .ag-row-focused {
+    background-color: #f5c38d !important;
+  }
+  
+  .ag-theme-custom .ag-row-odd {
+     background-color: #fef2e5 !important; /* ✅ Light yellow */
+  }
+  
+  .ag-theme-custom .ag-header {
+    font-weight: 600;
+    border-bottom: 2px solid hsl(var(--border));
+  }
+  
+  .ag-theme-custom .ag-header-cell {
+    border-right: 1px solid hsl(var(--border));
+  }
+  
+  .ag-theme-custom .ag-cell {
+    border-right: 1px solid hsl(var(--border) / 0.5);
+    display: flex;
+    align-items: center;
+  }
+  
+  .ag-theme-custom .ag-row {
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
+  }
+  
+  .ag-theme-custom .ag-row:hover {
+    background-color: hsl(var(--muted) / 0.5);
+  }
+  
+  .ag-theme-custom .ag-root-wrapper {
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--ag-border-radius);
+    overflow: hidden;
+  }
+  
+  .ag-theme-custom .ag-paging-panel {
+    border-top: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted) / 0.3);
+    padding: 12px;
+  }
+  
+  .ag-theme-custom .ag-paging-button {
+    background-color: hsl(var(--background));
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+    border-radius: calc(var(--radius) - 2px);
+    padding: 4px 8px;
+    margin: 0 2px;
+  }
+  
+  .ag-theme-custom .ag-paging-button:hover {
+    background-color: hsl(var(--muted));
+  }
+  
+  .ag-theme-custom .ag-paging-button.ag-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .ag-theme-custom .ag-filter-toolpanel {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--ag-border-radius);
+  }
+  
+  .ag-theme-custom .ag-menu {
+    background-color: hsl(var(--popover));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--ag-border-radius);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  
+  .ag-theme-custom .ag-menu-option {
+    padding: 8px 12px;
+  }
+  
+  .ag-theme-custom .ag-menu-option:hover {
+    background-color: hsl(var(--accent));
+  }
+  
+  /* Dark mode specific adjustments */
+  .dark .ag-theme-custom {
+    --ag-odd-row-background-color: hsl(var(--muted) / 0.15);
+    --ag-even-row-background-color: hsl(var(--background));
+  }
+  
+  /* Custom scrollbar */
+  .ag-theme-custom .ag-body-horizontal-scroll::-webkit-scrollbar,
+  .ag-theme-custom .ag-body-vertical-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .ag-theme-custom .ag-body-horizontal-scroll::-webkit-scrollbar-track,
+  .ag-theme-custom .ag-body-vertical-scroll::-webkit-scrollbar-track {
+    background: hsl(var(--muted) / 0.3);
+  }
+  
+  .ag-theme-custom .ag-body-horizontal-scroll::-webkit-scrollbar-thumb,
+  .ag-theme-custom .ag-body-vertical-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+  
+  .ag-theme-custom .ag-body-horizontal-scroll::-webkit-scrollbar-thumb:hover,
+  .ag-theme-custom .ag-body-vertical-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
